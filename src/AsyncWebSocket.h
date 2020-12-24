@@ -22,7 +22,7 @@
 #define ASYNCWEBSOCKET_H_
 
 #include <Arduino.h>
-#ifdef ESP32
+#if defined(ESP32) || defined(WIO_TERMINAL)
 #include <AsyncTCP.h>
 #define WS_MAX_QUEUED_MESSAGES 32
 #else

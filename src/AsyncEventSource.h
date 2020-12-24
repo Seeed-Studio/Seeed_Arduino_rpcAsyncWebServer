@@ -21,10 +21,10 @@
 #define ASYNCEVENTSOURCE_H_
 
 #include <Arduino.h>
-#ifdef ESP32
+#if defined(ESP32) || defined(WIO_TERMINAL)
 #include <AsyncTCP.h>
 #define SSE_MAX_QUEUED_MESSAGES 32
-#else
+#elif defined(ESP8266)
 #include <ESPAsyncTCP.h>
 #define SSE_MAX_QUEUED_MESSAGES 8
 #endif
@@ -39,7 +39,7 @@
 #endif
 #endif
 
-#ifdef ESP32
+#if defined(ESP32) || defined(WIO_TERMINAL)
 #define DEFAULT_MAX_SSE_CLIENTS 8
 #else
 #define DEFAULT_MAX_SSE_CLIENTS 4

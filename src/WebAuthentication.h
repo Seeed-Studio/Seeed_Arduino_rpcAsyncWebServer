@@ -23,6 +23,9 @@
 #define WEB_AUTHENTICATION_H_
 
 #include "Arduino.h"
+#ifdef WIO_TERMINAL
+#include "Seeed_mbedtls.h"
+#endif
 
 bool checkBasicAuthentication(const char * header, const char * username, const char * password);
 String requestDigestAuthentication(const char * realm);

@@ -12,26 +12,37 @@
 #elif defined(ESP8266)
 #include <ESP8266WiFi.h>
 #include <ESPAsyncTCP.h>
+#elif defined(WIO_TERINAL)
+#include <rpcWiFI.h>
+#include <AsyncTCP.h>
 #endif
 #include <ESPAsyncWebServer.h>
 
 AsyncWebServer server(80);
 
-const char* ssid = "YOUR_SSID";
-const char* password = "YOUR_PASSWORD";
+const char *ssid = "YOUR_SSID";
+const char *password = "YOUR_PASSWORD";
 
-const char* PARAM_MESSAGE = "message";
+const char *PARAM_MESSAGE = "message";
 
-void notFound(AsyncWebServerRequest *request) {
+void notFound(AsyncWebServerRequest *request)
+{
     request->send(404, "text/plain", "Not found");
 }
 
-void setup() {
+void setup()
+{
 
     Serial.begin(115200);
     WiFi.mode(WIFI_STA);
     WiFi.begin(ssid, password);
-    if (WiFi.waitForConnectResult() != WL_CONNECTED) {
+#ifdef WIO_TERINAL
+    if (WiFi.status() != WL_CONNECTED)
+    {
+#else
+    if (WiFi.waitForConnectResult() != WL_CONNECTED)
+    {
+#endif
         Serial.printf("WiFi Failed!\n");
         return;
     }
@@ -39,27 +50,33 @@ void setup() {
     Serial.print("IP Address: ");
     Serial.println(WiFi.localIP());
 
-    server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
+    server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
         request->send(200, "text/plain", "Hello, world");
     });
 
     // Send a GET request to <IP>/get?message=<message>
-    server.on("/get", HTTP_GET, [] (AsyncWebServerRequest *request) {
+    server.on("/get", HTTP_GET, [](AsyncWebServerRequest *request) {
         String message;
-        if (request->hasParam(PARAM_MESSAGE)) {
+        if (request->hasParam(PARAM_MESSAGE))
+        {
             message = request->getParam(PARAM_MESSAGE)->value();
-        } else {
+        }
+        else
+        {
             message = "No message sent";
         }
         request->send(200, "text/plain", "Hello, GET: " + message);
     });
 
     // Send a POST request to <IP>/post with a form field message set to <message>
-    server.on("/post", HTTP_POST, [](AsyncWebServerRequest *request){
+    server.on("/post", HTTP_POST, [](AsyncWebServerRequest *request) {
         String message;
-        if (request->hasParam(PARAM_MESSAGE, true)) {
+        if (request->hasParam(PARAM_MESSAGE, true))
+        {
             message = request->getParam(PARAM_MESSAGE, true)->value();
-        } else {
+        }
+        else
+        {
             message = "No message sent";
         }
         request->send(200, "text/plain", "Hello, POST: " + message);
@@ -70,5 +87,7 @@ void setup() {
     server.begin();
 }
 
-void loop() {
+void loop()
+{
+    delay(1000);
 }

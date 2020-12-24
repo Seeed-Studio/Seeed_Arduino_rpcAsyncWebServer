@@ -20,7 +20,7 @@
 */
 #include "WebAuthentication.h"
 #include <libb64/cencode.h>
-#ifdef ESP32
+#if defined(ESP32) || defined(WIO_TERMINAL)
 #include "mbedtls/md5.h"
 #else
 #include "md5.h"
@@ -59,7 +59,7 @@ bool checkBasicAuthentication(const char * hash, const char * username, const ch
 }
 
 static bool getMD5(uint8_t * data, uint16_t len, char * output){//33 bytes or more
-#ifdef ESP32
+#if defined(ESP32) || defined(WIO_TERMINAL)
     mbedtls_md5_context _ctx;
 #else
     md5_context_t _ctx;
@@ -69,7 +69,7 @@ static bool getMD5(uint8_t * data, uint16_t len, char * output){//33 bytes or mo
   if(_buf == NULL)
     return false;
   memset(_buf, 0x00, 16);
-#ifdef ESP32
+#if defined(ESP32) || defined(WIO_TERMINAL)
   mbedtls_md5_init(&_ctx);
   mbedtls_md5_starts(&_ctx);
   mbedtls_md5_update(&_ctx, data, len);

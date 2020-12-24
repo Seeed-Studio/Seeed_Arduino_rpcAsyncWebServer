@@ -10,7 +10,7 @@ class SPIFFSEditor: public AsyncWebHandler {
     bool _authenticated;
     uint32_t _startTime;
   public:
-#ifdef ESP32
+#if defined(ESP32) || defined(WIO_TERMINAL)
     SPIFFSEditor(const fs::FS& fs, const String& username=String(), const String& password=String());
 #else
     SPIFFSEditor(const String& username=String(), const String& password=String(), const fs::FS& fs=SPIFFS);

@@ -24,11 +24,15 @@
 #include "Arduino.h"
 
 #include <functional>
+#ifdef  WIO_TERMINAL
+#include "Seeed_FS.h"
+#else
 #include "FS.h"
+#endif
 
 #include "StringArray.h"
 
-#ifdef ESP32
+#if defined(ESP32) || defined(WIO_TERMINAL)
 #include <WiFi.h>
 #include <AsyncTCP.h>
 #elif defined(ESP8266)

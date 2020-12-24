@@ -1,5 +1,9 @@
 #include "SPIFFSEditor.h"
-#include <FS.h>
+#ifdef  WIO_TERMINAL
+#include "Seeed_FS.h"
+#else
+#include "FS.h"
+#endif
 
 //File: edit.htm.gz, Size: 4151
 #define edit_htm_gz_len 4151
@@ -325,7 +329,7 @@ static void loadExcludeList(fs::FS &_fs, const char *filename){
         //addExclude("/*.js.gz");
         return;
     }
-#ifdef ESP32
+#if defined(ESP32) || defined(WIO_TERMINAL)
     if(excludeFile.isDirectory()){
       excludeFile.close();
       return;
@@ -376,7 +380,7 @@ static bool isExcluded(fs::FS &_fs, const char *filename) {
 
 // WEB HANDLER IMPLEMENTATION
 
-#ifdef ESP32
+#if defined(ESP32) || defined(WIO_TERMINAL)
 SPIFFSEditor::SPIFFSEditor(const fs::FS& fs, const String& username, const String& password)
 #else
 SPIFFSEditor::SPIFFSEditor(const String& username, const String& password, const fs::FS& fs)
@@ -398,7 +402,7 @@ bool SPIFFSEditor::canHandle(AsyncWebServerRequest *request){
         if(!request->_tempFile){
           return false;
         }
-#ifdef ESP32
+#if defined(ESP32) || defined(WIO_TERMINAL)
         if(request->_tempFile.isDirectory()){
           request->_tempFile.close();
           return false;
@@ -410,7 +414,7 @@ bool SPIFFSEditor::canHandle(AsyncWebServerRequest *request){
         if(!request->_tempFile){
           return false;
         }
-#ifdef ESP32
+#if defined(ESP32) || defined(WIO_TERMINAL)
         if(request->_tempFile.isDirectory()){
           request->_tempFile.close();
           return false;
@@ -439,14 +443,14 @@ void SPIFFSEditor::handleRequest(AsyncWebServerRequest *request){
   if(request->method() == HTTP_GET){
     if(request->hasParam("list")){
       String path = request->getParam("list")->value();
-#ifdef ESP32
+#if defined(ESP32) || defined(WIO_TERMINAL)
       File dir = _fs.open(path);
 #else
       Dir dir = _fs.openDir(path);
 #endif
       path = String();
       String output = "[";
-#ifdef ESP32
+#if defined(ESP32) || defined(WIO_TERMINAL)
       File entry = dir.openNextFile();
       while(entry){
 #else
@@ -454,7 +458,7 @@ void SPIFFSEditor::handleRequest(AsyncWebServerRequest *request){
         fs::File entry = dir.openFile("r");
 #endif
         if (isExcluded(_fs, entry.name())) {
-#ifdef ESP32
+#if defined(ESP32) || defined(WIO_TERMINAL)
             entry = dir.openNextFile();
 #endif
             continue;
@@ -467,13 +471,13 @@ void SPIFFSEditor::handleRequest(AsyncWebServerRequest *request){
         output += "\",\"size\":";
         output += String(entry.size());
         output += "}";
-#ifdef ESP32
+#if defined(ESP32) || defined(WIO_TERMINAL)
         entry = dir.openNextFile();
 #else
         entry.close();
 #endif
       }
-#ifdef ESP32
+#if defined(ESP32) || defined(WIO_TERMINAL)
       dir.close();
 #endif
       output += "]";

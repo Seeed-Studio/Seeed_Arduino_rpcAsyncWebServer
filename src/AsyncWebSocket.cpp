@@ -559,7 +559,7 @@ void AsyncWebSocketClient::_queueMessage(AsyncWebSocketMessage *dataMessage){
     return;
   }
   if(_messageQueue.length() >= WS_MAX_QUEUED_MESSAGES){
-      ets_printf("ERROR: Too many messages queued\n");
+      log_e("ERROR: Too many messages queued\n");
       delete dataMessage;
   } else {
       _messageQueue.add(dataMessage);
@@ -749,7 +749,11 @@ size_t AsyncWebSocketClient::printf_P(PGM_P formatP, ...) {
     return 0;
   }
   char* buffer = temp;
+#ifdef WIO_TERMINAL
+  size_t len = vsnprintf(temp, MAX_PRINTF_LEN, formatP, arg);
+#else
   size_t len = vsnprintf_P(temp, MAX_PRINTF_LEN, formatP, arg);
+#endif
   va_end(arg);
 
   if (len > (MAX_PRINTF_LEN - 1)) {
@@ -759,7 +763,11 @@ size_t AsyncWebSocketClient::printf_P(PGM_P formatP, ...) {
       return 0;
     }
     va_start(arg, formatP);
+#ifdef WIO_TERMINAL
+    snprintf(buffer, len + 1, formatP, arg);
+#else
     vsnprintf_P(buffer, len + 1, formatP, arg);
+#endif
     va_end(arg);
   }
   text(buffer, len);
@@ -840,7 +848,8 @@ void AsyncWebSocketClient::binary(AsyncWebSocketMessageBuffer * buffer)
 
 IPAddress AsyncWebSocketClient::remoteIP() {
     if(!_client) {
-        return IPAddress(0U);
+      int32_t addr = 0;
+      return IPAddress(addr);
     }
     return _client->remoteIP();
 }
@@ -1068,7 +1077,11 @@ size_t AsyncWebSocket::printfAll_P(PGM_P formatP, ...) {
     return 0;
   }
   va_start(arg, formatP);
+#ifdef WIO_TERMINAL
+  size_t len = vsnprintf(temp, MAX_PRINTF_LEN, formatP, arg);
+#else
   size_t len = vsnprintf_P(temp, MAX_PRINTF_LEN, formatP, arg);
+#endif
   va_end(arg);
   delete[] temp;
   
@@ -1078,7 +1091,11 @@ size_t AsyncWebSocket::printfAll_P(PGM_P formatP, ...) {
   }
 
   va_start(arg, formatP);
+#ifdef WIO_TERMINAL
+  snprintf_P((char *)buffer->get(), len + 1, formatP, arg);
+#else
   vsnprintf_P((char *)buffer->get(), len + 1, formatP, arg);
+#endif
   va_end(arg);
 
   textAll(buffer);

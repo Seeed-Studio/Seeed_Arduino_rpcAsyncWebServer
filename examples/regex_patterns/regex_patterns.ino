@@ -24,6 +24,9 @@
 #elif defined(ESP8266)
 #include <ESP8266WiFi.h>
 #include <ESPAsyncTCP.h>
+#elif defined(WIO_TERINAL)
+#include <rpcWiFI.h>
+#include <AsyncTCP.h>
 #endif
 #include <ESPAsyncWebServer.h>
 
